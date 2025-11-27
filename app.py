@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import Usuario, Produto, Estoque, db_session, init_db
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 app = Flask(__name__)
-app.secret_key = "meusegredo"  # troque depois
+app.secret_key = "meusegredo"
 
 
 # ============================
@@ -92,7 +92,47 @@ def cadastrar_usuario():
 @app.route("/")
 @login_required
 def home():
-    return render_template("index.html")
+    return redirect("/dashboard")
+
+# ============================
+# DASHBOARD
+# ============================
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    # total de usuários
+    total_usuarios = db_session.execute(
+        select(func.count()).select_from(Usuario)
+    ).scalar()
+
+    # total de produtos
+    total_produtos = db_session.execute(
+        select(func.count()).select_from(Produto)
+    ).scalar()
+
+    # lucro e gastos
+    movimentos = db_session.execute(
+        select(Estoque)
+    ).scalars().all()
+
+    lucro = 0
+    gastos = 0
+
+    for mov in movimentos:
+        if mov.status == "entrada":
+            gastos += mov.quantidade_movimentada * mov.produto.preco
+        elif mov.status == "saida":
+            lucro += mov.quantidade_movimentada * mov.produto.preco
+
+    return render_template(
+        "dashboard.html",
+        total_usuarios=total_usuarios,
+        total_produtos=total_produtos,
+        lucro=lucro,
+        gastos=gastos,
+    )
+
 
 
 # ============================

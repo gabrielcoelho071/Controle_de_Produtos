@@ -1,0 +1,41 @@
+{% extends "index.html" %}
+
+{% block conteudo %}
+
+<div class="container mt-4">
+    <h3 class="mb-4 text-center">📊 Dashboard Geral</h3>
+
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h5>👥 Usuários</h5>
+                <h2 class="text-primary">{{ total_usuarios }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h5>📦 Produtos</h5>
+                <h2 class="text-success">{{ total_produtos }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h5>💰 Lucro</h5>
+                <h2 class="text-warning">R$ {{ "%.2f"|format(lucro) }}</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm text-center p-3">
+                <h5>📉 Gastos</h5>
+                <h2 class="text-danger">R$ {{ "%.2f"|format(gastos) }}</h2>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
