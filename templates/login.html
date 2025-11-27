@@ -1,0 +1,26 @@
+{% extends 'index.html' %}
+
+{% block conteudo %}
+
+<h2>🔐 Login</h2>
+<hr>
+
+<form method="POST">
+
+    <label class="form-label">Email:</label>
+    <input type="email" class="form-control" name="email" required>
+
+    <label class="form-label mt-3">Senha:</label>
+    <input type="password" class="form-control" name="senha" required>
+
+    <button class="btn btn-primary mt-4">Entrar</button>
+</form>
+
+<div class="mt-4 text-center">
+    <p>É novo aqui?</p>
+    <a href="/usuario/cadastrar" class="btn btn-outline-success">
+        Criar conta
+    </a>
+</div>
+
+{% endblock conteudo %}

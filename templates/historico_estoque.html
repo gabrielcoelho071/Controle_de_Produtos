@@ -1,0 +1,40 @@
+{% extends 'index.html' %}
+
+{% block conteudo %}
+
+<h2>📊 Histórico de Estoque — {{ produto.nome }}</h2>
+<hr>
+
+<a href="/estoque/{{ produto.id_produto }}/movimentar" class="btn btn-success mb-3">
+    Registrar Movimentação
+</a>
+
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Status</th>
+        <th>Quantidade</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for m in produto.estoque %}
+    <tr>
+        <td>{{ m.id_estoque }}</td>
+        <td>
+            {% if m.status == "entrada" %}
+                <span class="badge bg-success">Entrada</span>
+            {% else %}
+                <span class="badge bg-danger">Saída</span>
+            {% endif %}
+        </td>
+        <td>{{ m.quantidade_movimentada }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<a href="/produtos" class="btn btn-secondary">Voltar</a>
+
+{% endblock conteudo %}
