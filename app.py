@@ -106,33 +106,36 @@ def dashboard():
         select(func.count()).select_from(Usuario)
     ).scalar()
 
-    # total de produtos
+    # total de produtos (somando quantidades)
     total_produtos = db_session.execute(
-        select(func.count()).select_from(Produto)
-    ).scalar()
+        select(func.sum(Produto.quantidade))
+    ).scalar() or 0
 
-    # lucro e gastos
-    movimentos = db_session.execute(
-        select(Estoque)
+    # total de vendas = somar todas as saídas
+    total_vendas = db_session.execute(
+        select(func.sum(Estoque.quantidade_movimentada)).where(Estoque.status == "saida")
+    ).scalar() or 0
+
+    # produtos com quantidade menor que 5
+    produtos_baixo_estoque_list = db_session.execute(
+        select(Produto).where(Produto.quantidade <= 5)
     ).scalars().all()
 
-    lucro = 0
-    gastos = 0
-
-    for mov in movimentos:
-        if mov.status == "entrada":
-            gastos += mov.quantidade_movimentada * mov.produto.preco
-        elif mov.status == "saida":
-            lucro += mov.quantidade_movimentada * mov.produto.preco
+    # lucro (somente saídas)
+    movimentos = db_session.execute(select(Estoque)).scalars().all()
+    lucro = sum(
+        mov.quantidade_movimentada * mov.produto.preco
+        for mov in movimentos if mov.status == "saida"
+    )
 
     return render_template(
         "dashboard.html",
         total_usuarios=total_usuarios,
         total_produtos=total_produtos,
+        total_vendas=total_vendas,
         lucro=lucro,
-        gastos=gastos,
+        produtos_baixo_estoque_list=produtos_baixo_estoque_list
     )
-
 
 
 # ============================
@@ -244,7 +247,7 @@ def movimentar_estoque(id_produto):
                 f"Estoque atual: {produto.quantidade}.",
                 "warning"
             )
-            return redirect(f"/estoque/{id_produto}")
+            return redirect(f"/estoque/{id_produto}/movimentar")
 
         mov = Estoque(
             quantidade_movimentada=quantidade,

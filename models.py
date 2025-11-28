@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Float
 from sqlalchemy.orm import sessionmaker, scoped_session, relationship, declarative_base
-from werkzeug.security import generate_password_hash, check_password_hash
 
 engine = create_engine('sqlite:///banco.db')
 db_session = scoped_session(sessionmaker(bind=engine))
@@ -17,16 +16,8 @@ class Usuario(Base):
     id_usuario = Column(Integer, primary_key=True)
     nome = Column(String(50), nullable=False)
     email = Column(String(80), nullable=False, unique=True)
-    senha = Column(String(200), nullable=False)
+    senha = Column(String(120), nullable=False)
 
-    # ----- Segurança -----
-    def set_password(self, senha):
-        self.senha = generate_password_hash(senha)
-
-    def check_password(self, senha):
-        return check_password_hash(self.senha, senha)
-
-    # ----- CRUD -----
     def save(self):
         db_session.add(self)
         db_session.commit()
@@ -35,7 +26,6 @@ class Usuario(Base):
         db_session.delete(self)
         db_session.commit()
 
-    # ----- Representação -----
     def serialize(self):
         return {
             "id_usuario": self.id_usuario,
@@ -94,11 +84,12 @@ class Estoque(Base):
     id_estoque = Column(Integer, primary_key=True)
     id_produto = Column(Integer, ForeignKey('produtos.id_produto'))
     quantidade_movimentada = Column(Integer, nullable=False)
-    status = Column(String(10), nullable=False)
+    status = Column(String(10), nullable=False)  # entrada / saída
 
     produto = relationship("Produto", back_populates="estoque")
 
     def save(self):
+        # altera o estoque automaticamente
         if self.status == "entrada":
             self.produto.quantidade += self.quantidade_movimentada
         elif self.status == "saida":
@@ -131,3 +122,7 @@ class Estoque(Base):
 # =======================
 def init_db():
     Base.metadata.create_all(bind=engine)
+
+
+if __name__ == '__main__':
+    init_db()

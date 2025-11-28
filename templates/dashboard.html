@@ -5,37 +5,70 @@
 <div class="container mt-4">
     <h3 class="mb-4 text-center">📊 Dashboard Geral</h3>
 
+    <!-- CARDS -->
     <div class="row g-4">
 
+        <!-- Usuários -->
         <div class="col-md-3">
             <div class="card shadow-sm text-center p-3">
                 <h5>👥 Usuários</h5>
-                <h2 class="text-primary">{{ total_usuarios }}</h2>
+                <h2>{{ total_usuarios }}</h2>
             </div>
         </div>
 
+        <!-- Produtos -->
         <div class="col-md-3">
             <div class="card shadow-sm text-center p-3">
                 <h5>📦 Produtos</h5>
-                <h2 class="text-success">{{ total_produtos }}</h2>
+                <h2>{{ total_produtos }}</h2>
             </div>
         </div>
 
+        <!-- Lucro -->
         <div class="col-md-3">
             <div class="card shadow-sm text-center p-3">
                 <h5>💰 Lucro</h5>
-                <h2 class="text-warning">R$ {{ "%.2f"|format(lucro) }}</h2>
+                <h2>R$ {{ "%.2f"|format(lucro) }}</h2>
             </div>
         </div>
 
+        <!-- Total de Vendas (Saídas) -->
         <div class="col-md-3">
             <div class="card shadow-sm text-center p-3">
-                <h5>📉 Gastos</h5>
-                <h2 class="text-danger">R$ {{ "%.2f"|format(gastos) }}</h2>
+                <h5>📊 Total de Vendas</h5>
+                <h2>
+                    {% if total_vendas > 0 %}
+                        {{ total_vendas }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </h2>
             </div>
         </div>
 
     </div>
+
+    <!-- Lista de produtos em baixo estoque -->
+    <div class="row mt-5">
+        <div class="col">
+            <h4 class="mb-3 text-center">⚠️ Produtos em Baixo Estoque</h4>
+            {% if produtos_baixo_estoque_list|length > 0 %}
+                <div class="row g-3 justify-content-center">
+                    {% for produto in produtos_baixo_estoque_list %}
+                    <div class="col-md-3">
+                        <div class="card shadow-sm text-center p-3">
+                            <h5>{{ produto.nome }}</h5>
+                            <p>Quantidade: <strong>{{ produto.quantidade }}</strong></p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center">Todos os produtos estão com estoque ok ✅</p>
+            {% endif %}
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}
